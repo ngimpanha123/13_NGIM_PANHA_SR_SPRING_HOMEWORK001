@@ -13,7 +13,7 @@ public class TicketRequest {
     private String sourceStation;
     private String destinationStation;
     private Double price;
-    private String paymentStatus;
+    private Boolean paymentStatus;
     private TicketStatus ticketStatus;
     private String seatNumber;
 }

@@ -2,6 +2,7 @@ package org.example.tacket.controller;
 
 import org.example.tacket.config.ApiResponse;
 import org.example.tacket.config.TicketStatus;
+import org.example.tacket.config.UpdatePaymentStatusRequest;
 import org.example.tacket.model.Ticket;
 import org.example.tacket.request.TicketRequest;
 import org.example.tacket.service.TicketService;
@@ -54,7 +55,7 @@ public class TicketController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Ticket>>> getAllTickets(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size){
+    public ResponseEntity<ApiResponse<List<Ticket>>> getAllTickets(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size){
 
         List<Ticket> ticketList = ticketService.getAllTickets(page, size);
         ApiResponse<List<Ticket>> response = (ticketList == null || ticketList.isEmpty())
@@ -81,7 +82,7 @@ public class TicketController {
         Ticket result = ticketService.getTicketById(ticketId);
         ApiResponse<Ticket> response =  result == null ?  new ApiResponse<>(
                 false,
-                "Ticket fetched successfully",
+                "Ticket fetched Unsuccessfully",
                 HttpStatus.NOT_FOUND.toString(),
                 result,
                 Instant.now()
@@ -101,7 +102,7 @@ public class TicketController {
         List<Ticket> result = ticketService.searchByPassengerName(passengerName);
         ApiResponse<List<Ticket>> response = result == null ? new ApiResponse<>(
                 false,
-                "Tickets fetched successfully",
+                "Tickets fetched Unsuccessfully",
                 HttpStatus.NOT_FOUND.toString(),
                 result,
                 Instant.now()
@@ -120,9 +121,9 @@ public class TicketController {
 
         List<Ticket> tickets = ticketService.filterByStatusAndDate(status,date);
 
-        ApiResponse<List<Ticket>> respone = (tickets==null || tickets.isEmpty())  ?new ApiResponse<>(
+        ApiResponse<List<Ticket>> respone = (tickets==null || tickets.isEmpty())  ? new ApiResponse<>(
                 false,
-                "Filtered tickets retrieved successfully",
+                "Filtered tickets retrieved Unsuccessfully",
                 HttpStatus.NOT_FOUND.toString(),
                 tickets,
                 Instant.now()
@@ -164,6 +165,35 @@ public class TicketController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @PutMapping("/bulk")
+    public ResponseEntity<ApiResponse<List<Ticket>>> updatePaymentStatus(@RequestBody UpdatePaymentStatusRequest request){
+
+        List<Ticket> updatedTickets = ticketService.updatePaymentStatus(
+                request.getTicketIds(),
+                request.getPaymentStatus()
+        );
+
+        if(updatedTickets.isEmpty()){
+            ApiResponse<List<Ticket>> response = new ApiResponse<>(
+                    false,
+                    "No tickets found with the provided IDs.",
+                    HttpStatus.NOT_FOUND.toString(),
+                    updatedTickets,
+                    Instant.now()
+            );
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        ApiResponse<List<Ticket>> response = new ApiResponse<>(
+                true,
+                "Payment status updated successfully.",
+                HttpStatus.OK.toString(),
+                updatedTickets,
+                Instant.now()
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> deleteTicket(@PathVariable Long id){
         Ticket ticket = ticketService.getTicketById(id);
@@ -188,7 +218,5 @@ public class TicketController {
         );
         return ResponseEntity.ok(response);
     }
-
-
 
 }

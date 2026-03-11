@@ -17,12 +17,18 @@ public class TicketService {
     private AtomicLong counter = new AtomicLong() ;
     private List<Ticket> tickes = new ArrayList<>(
             List.of(
-                    new Ticket(counter.incrementAndGet(),"Harry Potter", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,"true",TicketStatus.BOOKED,"A4"),
-                    new Ticket(counter.incrementAndGet(),"String", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,"true",TicketStatus.CANCELLED,"A4"),
-                    new Ticket(counter.incrementAndGet(),"Ra", LocalDate.of(2026, 3, 11),"pp","pvh",10.0,"true",TicketStatus.COMPLETED,"A01"),
-                    new Ticket(counter.incrementAndGet(),"Harry Potter II", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,"true",TicketStatus.COMPLETED,"A4"),
-                    new Ticket(counter.incrementAndGet(),"Harry Potter III", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,"true",TicketStatus.CANCELLED,"A4"),
-                    new Ticket(counter.incrementAndGet(),"Harry Potter", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,"true",TicketStatus.BOOKED,"A4")
+                    new Ticket(counter.incrementAndGet(),"Harry Potter", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,true,TicketStatus.BOOKED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"String", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,true,TicketStatus.CANCELLED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"Ra", LocalDate.of(2026, 3, 11),"pp","pvh",10.0,true,TicketStatus.COMPLETED,"A01"),
+                    new Ticket(counter.incrementAndGet(),"Harry Potter II", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,false,TicketStatus.COMPLETED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"Harry Potter III", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,false,TicketStatus.CANCELLED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"Harry Potter", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,false,TicketStatus.BOOKED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"Harry Potter", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,true,TicketStatus.BOOKED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"String", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,true,TicketStatus.CANCELLED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"Ra", LocalDate.of(2026, 3, 11),"pp","pvh",10.0,true,TicketStatus.COMPLETED,"A01"),
+                    new Ticket(counter.incrementAndGet(),"Harry Potter II", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,false,TicketStatus.COMPLETED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"Harry Potter III", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,false,TicketStatus.CANCELLED,"A4"),
+                    new Ticket(counter.incrementAndGet(),"Harry Potter", LocalDate.of(2026, 3, 11),"Boston","Washington DC",180.25,false,TicketStatus.BOOKED,"A4")
             )
     );
 
@@ -58,7 +64,7 @@ public class TicketService {
 
     public  List<Ticket> getAllTickets(int page , int size){
         return tickes.stream()
-                .skip( page * size)
+                .skip( (page-1) * size)
                 .limit(size)
                 .toList();
     }
@@ -100,6 +106,20 @@ public class TicketService {
         }
 
         return ticket;
+    }
+
+    public List<Ticket> updatePaymentStatus(List<Long> ids, Boolean paymentStatus){
+
+        List<Ticket> updatedTickets = new ArrayList<>();
+        for(Long id : ids){
+            Ticket ticket = getTicketById(id);
+
+            if(ticket != null){
+                ticket.setPaymentStatus(paymentStatus);
+                updatedTickets.add(ticket);
+            }
+        }
+        return updatedTickets;
     }
 
     public void deleteTicket(Long id){
