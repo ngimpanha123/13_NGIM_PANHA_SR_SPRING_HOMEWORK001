@@ -80,13 +80,18 @@ public class TicketController {
     public ResponseEntity<ApiResponse<Ticket>> getTicketById(@PathVariable("ticket-Id") Long ticketId){
 
         Ticket result = ticketService.getTicketById(ticketId);
-        ApiResponse<Ticket> response =  result == null ?  new ApiResponse<>(
-                false,
-                "Ticket fetched Unsuccessfully",
-                HttpStatus.NOT_FOUND.toString(),
-                result,
-                Instant.now()
-        ) : new ApiResponse<>(
+        if (result == null) {
+            ApiResponse<Ticket> response = new ApiResponse<>(
+                    false,
+                    "Ticket fetched unsuccessfully",
+                    HttpStatus.NOT_FOUND.toString(),
+                    result,
+                    Instant.now()
+            );
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        ApiResponse<Ticket> response = new ApiResponse<>(
                 true,
                 "Ticket fetched successfully",
                 HttpStatus.OK.toString(),
@@ -100,13 +105,20 @@ public class TicketController {
     public ResponseEntity<ApiResponse<List<Ticket>>> searchByPassengerName(@RequestParam String passengerName){
 
         List<Ticket> result = ticketService.searchByPassengerName(passengerName);
-        ApiResponse<List<Ticket>> response = result == null ? new ApiResponse<>(
-                false,
-                "Tickets fetched Unsuccessfully",
-                HttpStatus.NOT_FOUND.toString(),
-                result,
-                Instant.now()
-        ) : new ApiResponse<>(
+
+        if (result == null || result.isEmpty()) {
+            ApiResponse<List<Ticket>> response = new ApiResponse<>(
+                    false,
+                    "Tickets fetched unsuccessfully",
+                    HttpStatus.NOT_FOUND.toString(),
+                    result,
+                    Instant.now()
+            );
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        ApiResponse<List<Ticket>> response = new ApiResponse<>(
                 true,
                 "Tickets fetched successfully",
                 HttpStatus.OK.toString(),
@@ -121,13 +133,19 @@ public class TicketController {
 
         List<Ticket> tickets = ticketService.filterByStatusAndDate(status,date);
 
-        ApiResponse<List<Ticket>> respone = (tickets==null || tickets.isEmpty())  ? new ApiResponse<>(
-                false,
-                "Filtered tickets retrieved Unsuccessfully",
-                HttpStatus.NOT_FOUND.toString(),
-                tickets,
-                Instant.now()
-        ): new ApiResponse<>(
+        if (tickets == null || tickets.isEmpty()) {
+            ApiResponse<List<Ticket>> response = new ApiResponse<>(
+                    false,
+                    "Filtered tickets retrieved unsuccessfully",
+                    HttpStatus.NOT_FOUND.toString(),
+                    tickets,
+                    Instant.now()
+            );
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        ApiResponse<List<Ticket>> response = new ApiResponse<>(
                 true,
                 "Filtered tickets retrieved successfully",
                 HttpStatus.OK.toString(),
@@ -135,7 +153,7 @@ public class TicketController {
                 Instant.now()
         );
 
-        return ResponseEntity.ok(respone);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/{id}")
